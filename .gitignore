@@ -1,0 +1,22 @@
+# Xcode
+build/
+DerivedData/
+*.xcodeproj/
+*.xcworkspace/
+xcuserdata/
+*.xcuserstate
+.swiftpm/
+Package.resolved
+
+# macOS
+.DS_Store
+
+# CI artifacts
+*.ipa
+*.app
+*.dSYM.zip
+*.dSYM
+
+# Misc
+.idea/
+.vscode/

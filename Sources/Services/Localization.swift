@@ -1,0 +1,340 @@
+import Foundation
+
+enum AppLanguage: String, CaseIterable, Identifiable, Codable {
+    case ru, en, uk
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .ru: return "Русский"
+        case .en: return "English"
+        case .uk: return "Українська"
+        }
+    }
+}
+
+struct L10n {
+    let language: AppLanguage
+
+    private static let dict: [AppLanguage: [String: String]] = [
+        .ru: [
+            "tab.accounts":     "Аккаунты",
+            "tab.bulk":         "Действия",
+            "tab.logs":         "Логи",
+            "tab.settings":     "Настройки",
+
+            "accounts.title":   "Аккаунты",
+            "accounts.empty":   "Нет ни одного аккаунта",
+            "accounts.add":     "Добавить аккаунт",
+            "accounts.delete":  "Удалить",
+            "accounts.delete.confirm": "Удалить этот аккаунт? Сессия будет полностью стёрта с устройства.",
+            "accounts.count.format": "Активных: %d из %d",
+
+            "add.title":        "Новый аккаунт",
+            "add.phone":        "Номер телефона",
+            "add.phone.placeholder": "+7 999 123-45-67",
+            "add.phone.send":   "Получить код",
+            "add.code":         "Код из Telegram",
+            "add.code.placeholder": "12345",
+            "add.code.confirm": "Войти",
+            "add.code.info":    "Код отправлен на номер %@",
+            "add.password":     "2FA пароль",
+            "add.password.placeholder": "Облачный пароль",
+            "add.password.confirm": "Подтвердить",
+            "add.password.hint": "Подсказка: %@",
+            "add.register.first": "Имя",
+            "add.register.last":  "Фамилия",
+            "add.register.confirm": "Зарегистрировать",
+            "add.cancel":       "Отмена",
+            "add.ready":        "Аккаунт добавлен",
+
+            "bulk.title":       "Массовые действия",
+            "bulk.subscribe":   "Подписаться на канал/чат",
+            "bulk.message":     "Отправить сообщение",
+            "bulk.giveaway":    "Помощник по розыгрышам",
+            "bulk.captcha":     "Капчи / квизы (по очереди)",
+
+            "bulk.subscribe.title":       "Массовая подписка",
+            "bulk.subscribe.placeholder": "@channel или https://t.me/channel",
+            "bulk.subscribe.run":         "Подписать всех",
+            "bulk.subscribe.empty":       "Введи @username или ссылку t.me/...",
+
+            "bulk.message.title":       "Массовая отправка",
+            "bulk.message.target":      "Кому (юзернейм или ссылка)",
+            "bulk.message.text":        "Текст сообщения",
+            "bulk.message.run":         "Отправить со всех аккаунтов",
+
+            "bulk.giveaway.title":   "Розыгрыши: клик по кнопке",
+            "bulk.giveaway.target":  "Чат/канал (@username или ссылка)",
+            "bulk.giveaway.fetch":   "Получить последнее сообщение",
+            "bulk.giveaway.click":   "Нажать со всех аккаунтов",
+            "bulk.giveaway.no_buttons": "В сообщении нет inline-кнопок",
+
+            "bulk.captcha.title":    "Капчи (по очереди)",
+            "bulk.captcha.target":   "Чат/бот (@username или ссылка)",
+            "bulk.captcha.start":    "Начать обход",
+            "bulk.captcha.next":     "Следующий аккаунт",
+            "bulk.captcha.skip":     "Пропустить",
+            "bulk.captcha.send":     "Отправить ответ",
+            "bulk.captcha.input":    "Текст ответа",
+            "bulk.captcha.click":    "Нажать кнопку",
+            "bulk.captcha.done":     "Все аккаунты пройдены",
+
+            "bulk.delay":            "Задержка между аккаунтами",
+            "bulk.delay.format":     "%.1f сек",
+            "bulk.running":          "Выполняется… (%d/%d)",
+            "bulk.results":          "Результаты",
+            "bulk.success":          "Успех",
+            "bulk.failed":           "Ошибка",
+            "bulk.no_accounts":      "Нет авторизованных аккаунтов",
+
+            "settings.title":        "Настройки",
+            "settings.theme":        "Тема",
+            "settings.language":     "Язык",
+            "settings.font":         "Шрифт",
+            "settings.font_size":    "Размер шрифта",
+            "settings.delays":       "Anti-flood задержка (сек)",
+            "settings.show_splash":  "Сплеш при запуске",
+            "settings.haptic":       "Тактильные отклики",
+            "settings.developer":    "Разработчик",
+            "settings.danger":       "Опасная зона",
+            "settings.logout_all":   "Выйти из всех аккаунтов",
+            "settings.clear_logs":   "Очистить логи",
+            "settings.export_logs":  "Экспортировать логи",
+            "settings.about":        "О приложении",
+            "settings.version":      "Версия",
+
+            "logs.title":            "Логи",
+            "logs.empty":            "Логи пусты",
+            "logs.search":           "Поиск",
+            "logs.export":           "Экспорт",
+            "logs.clear":            "Очистить",
+            "logs.filter.all":       "Все",
+
+            "common.cancel":         "Отмена",
+            "common.ok":             "OK",
+            "common.error":          "Ошибка",
+            "common.retry":          "Повторить",
+            "common.close":          "Закрыть",
+            "common.save":           "Сохранить",
+            "common.copied":         "Скопировано",
+            "common.unknown":        "—",
+        ],
+        .en: [
+            "tab.accounts":     "Accounts",
+            "tab.bulk":         "Actions",
+            "tab.logs":         "Logs",
+            "tab.settings":     "Settings",
+
+            "accounts.title":   "Accounts",
+            "accounts.empty":   "No accounts yet",
+            "accounts.add":     "Add account",
+            "accounts.delete":  "Delete",
+            "accounts.delete.confirm": "Delete this account? Its session will be wiped from the device.",
+            "accounts.count.format": "Active: %d of %d",
+
+            "add.title":        "New account",
+            "add.phone":        "Phone number",
+            "add.phone.placeholder": "+1 555 123-45-67",
+            "add.phone.send":   "Get code",
+            "add.code":         "Telegram code",
+            "add.code.placeholder": "12345",
+            "add.code.confirm": "Sign in",
+            "add.code.info":    "Code sent to %@",
+            "add.password":     "2FA password",
+            "add.password.placeholder": "Cloud password",
+            "add.password.confirm": "Confirm",
+            "add.password.hint": "Hint: %@",
+            "add.register.first": "First name",
+            "add.register.last":  "Last name",
+            "add.register.confirm": "Register",
+            "add.cancel":       "Cancel",
+            "add.ready":        "Account added",
+
+            "bulk.title":       "Bulk actions",
+            "bulk.subscribe":   "Subscribe to channel/chat",
+            "bulk.message":     "Send a message",
+            "bulk.giveaway":    "Giveaway helper",
+            "bulk.captcha":     "Captcha / quiz wizard",
+
+            "bulk.subscribe.title":       "Bulk subscribe",
+            "bulk.subscribe.placeholder": "@channel or https://t.me/channel",
+            "bulk.subscribe.run":         "Subscribe with all",
+            "bulk.subscribe.empty":       "Enter @username or t.me/... link",
+
+            "bulk.message.title":       "Bulk message",
+            "bulk.message.target":      "Target (username or link)",
+            "bulk.message.text":        "Message text",
+            "bulk.message.run":         "Send from all",
+
+            "bulk.giveaway.title":   "Giveaways: tap a button",
+            "bulk.giveaway.target":  "Chat/channel (@username or link)",
+            "bulk.giveaway.fetch":   "Fetch latest message",
+            "bulk.giveaway.click":   "Click on all accounts",
+            "bulk.giveaway.no_buttons": "Message has no inline buttons",
+
+            "bulk.captcha.title":    "Captcha (one-by-one)",
+            "bulk.captcha.target":   "Chat/bot (@username or link)",
+            "bulk.captcha.start":    "Start walkthrough",
+            "bulk.captcha.next":     "Next account",
+            "bulk.captcha.skip":     "Skip",
+            "bulk.captcha.send":     "Send reply",
+            "bulk.captcha.input":    "Reply text",
+            "bulk.captcha.click":    "Tap button",
+            "bulk.captcha.done":     "All accounts done",
+
+            "bulk.delay":            "Delay between accounts",
+            "bulk.delay.format":     "%.1f s",
+            "bulk.running":          "Running… (%d/%d)",
+            "bulk.results":          "Results",
+            "bulk.success":          "Success",
+            "bulk.failed":           "Failed",
+            "bulk.no_accounts":      "No authorized accounts",
+
+            "settings.title":        "Settings",
+            "settings.theme":        "Theme",
+            "settings.language":     "Language",
+            "settings.font":         "Font",
+            "settings.font_size":    "Font size",
+            "settings.delays":       "Anti-flood delay (s)",
+            "settings.show_splash":  "Show splash on launch",
+            "settings.haptic":       "Haptic feedback",
+            "settings.developer":    "Developer",
+            "settings.danger":       "Danger zone",
+            "settings.logout_all":   "Sign out of all accounts",
+            "settings.clear_logs":   "Clear logs",
+            "settings.export_logs":  "Export logs",
+            "settings.about":        "About",
+            "settings.version":      "Version",
+
+            "logs.title":            "Logs",
+            "logs.empty":            "Log is empty",
+            "logs.search":           "Search",
+            "logs.export":           "Export",
+            "logs.clear":            "Clear",
+            "logs.filter.all":       "All",
+
+            "common.cancel":         "Cancel",
+            "common.ok":             "OK",
+            "common.error":          "Error",
+            "common.retry":          "Retry",
+            "common.close":          "Close",
+            "common.save":           "Save",
+            "common.copied":         "Copied",
+            "common.unknown":        "—",
+        ],
+        .uk: [
+            "tab.accounts":     "Акаунти",
+            "tab.bulk":         "Дії",
+            "tab.logs":         "Логи",
+            "tab.settings":     "Налаштування",
+
+            "accounts.title":   "Акаунти",
+            "accounts.empty":   "Немає жодного акаунта",
+            "accounts.add":     "Додати акаунт",
+            "accounts.delete":  "Видалити",
+            "accounts.delete.confirm": "Видалити цей акаунт? Сесію буде стерто з пристрою.",
+            "accounts.count.format": "Активних: %d з %d",
+
+            "add.title":        "Новий акаунт",
+            "add.phone":        "Номер телефону",
+            "add.phone.placeholder": "+380 99 123 45 67",
+            "add.phone.send":   "Отримати код",
+            "add.code":         "Код з Telegram",
+            "add.code.placeholder": "12345",
+            "add.code.confirm": "Увійти",
+            "add.code.info":    "Код надіслано на %@",
+            "add.password":     "2FA пароль",
+            "add.password.placeholder": "Хмарний пароль",
+            "add.password.confirm": "Підтвердити",
+            "add.password.hint": "Підказка: %@",
+            "add.register.first": "Ім'я",
+            "add.register.last":  "Прізвище",
+            "add.register.confirm": "Зареєструвати",
+            "add.cancel":       "Скасувати",
+            "add.ready":        "Акаунт додано",
+
+            "bulk.title":       "Масові дії",
+            "bulk.subscribe":   "Підписатися на канал/чат",
+            "bulk.message":     "Надіслати повідомлення",
+            "bulk.giveaway":    "Помічник для розіграшів",
+            "bulk.captcha":     "Капчі / квізи (по черзі)",
+
+            "bulk.subscribe.title":       "Масова підписка",
+            "bulk.subscribe.placeholder": "@channel або https://t.me/channel",
+            "bulk.subscribe.run":         "Підписати всіх",
+            "bulk.subscribe.empty":       "Введи @username або посилання t.me/...",
+
+            "bulk.message.title":       "Масове надсилання",
+            "bulk.message.target":      "Кому (юзернейм або посилання)",
+            "bulk.message.text":        "Текст повідомлення",
+            "bulk.message.run":         "Надіслати з усіх",
+
+            "bulk.giveaway.title":   "Розіграші: натиснути кнопку",
+            "bulk.giveaway.target":  "Чат/канал (@username або посилання)",
+            "bulk.giveaway.fetch":   "Отримати останнє повідомлення",
+            "bulk.giveaway.click":   "Натиснути на всіх акаунтах",
+            "bulk.giveaway.no_buttons": "У повідомленні немає inline-кнопок",
+
+            "bulk.captcha.title":    "Капчі (по черзі)",
+            "bulk.captcha.target":   "Чат/бот (@username або посилання)",
+            "bulk.captcha.start":    "Почати обхід",
+            "bulk.captcha.next":     "Наступний акаунт",
+            "bulk.captcha.skip":     "Пропустити",
+            "bulk.captcha.send":     "Надіслати відповідь",
+            "bulk.captcha.input":    "Текст відповіді",
+            "bulk.captcha.click":    "Натиснути кнопку",
+            "bulk.captcha.done":     "Усі акаунти пройдено",
+
+            "bulk.delay":            "Затримка між акаунтами",
+            "bulk.delay.format":     "%.1f с",
+            "bulk.running":          "Виконується… (%d/%d)",
+            "bulk.results":          "Результати",
+            "bulk.success":          "Успіх",
+            "bulk.failed":           "Помилка",
+            "bulk.no_accounts":      "Немає авторизованих акаунтів",
+
+            "settings.title":        "Налаштування",
+            "settings.theme":        "Тема",
+            "settings.language":     "Мова",
+            "settings.font":         "Шрифт",
+            "settings.font_size":    "Розмір шрифту",
+            "settings.delays":       "Anti-flood затримка (с)",
+            "settings.show_splash":  "Сплеш при запуску",
+            "settings.haptic":       "Тактильний відгук",
+            "settings.developer":    "Розробник",
+            "settings.danger":       "Небезпечна зона",
+            "settings.logout_all":   "Вийти з усіх акаунтів",
+            "settings.clear_logs":   "Очистити логи",
+            "settings.export_logs":  "Експорт логів",
+            "settings.about":        "Про додаток",
+            "settings.version":      "Версія",
+
+            "logs.title":            "Логи",
+            "logs.empty":            "Лог порожній",
+            "logs.search":           "Пошук",
+            "logs.export":           "Експорт",
+            "logs.clear":            "Очистити",
+            "logs.filter.all":       "Усі",
+
+            "common.cancel":         "Скасувати",
+            "common.ok":             "OK",
+            "common.error":          "Помилка",
+            "common.retry":          "Повторити",
+            "common.close":          "Закрити",
+            "common.save":           "Зберегти",
+            "common.copied":         "Скопійовано",
+            "common.unknown":        "—",
+        ],
+    ]
+
+    func t(_ key: String) -> String {
+        Self.dict[language]?[key] ?? Self.dict[.en]?[key] ?? key
+    }
+
+    func t(_ key: String, _ args: CVarArg...) -> String {
+        let format = t(key)
+        return String(format: format, arguments: args)
+    }
+}
