@@ -34,6 +34,11 @@ struct AccountsListView: View {
                 .environmentObject(manager)
                 .environmentObject(settings)
         }
+        .navigationDestination(for: String.self) { accountId in
+            if let acc = manager.accounts.first(where: { $0.id == accountId }) {
+                AccountInspectorView(account: acc)
+            }
+        }
         .alert(l.t("accounts.delete.confirm"), isPresented: Binding(
             get: { deleteCandidate != nil },
             set: { if !$0 { deleteCandidate = nil } }
@@ -68,9 +73,12 @@ struct AccountsListView: View {
                     .padding(.top, 4)
 
                     ForEach(manager.accounts) { account in
-                        AccountRow(account: account, onDelete: {
-                            deleteCandidate = account
-                        })
+                        NavigationLink(value: account.id) {
+                            AccountRow(account: account, onDelete: {
+                                deleteCandidate = account
+                            })
+                        }
+                        .buttonStyle(.plain)
                     }
 
                     Button(action: startAdd) {

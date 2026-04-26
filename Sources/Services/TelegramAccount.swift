@@ -10,9 +10,9 @@ final class TelegramAccount: ObservableObject, Identifiable {
     @Published var lastError: String?
     @Published var lastTdAuthorizationState: String = "loading"
 
-    private let client: TDLibClient
-    private let logger: AppLogger
-    private weak var managerRef: AccountManager?
+    let client: TDLibClient
+    let logger: AppLogger
+    weak var managerRef: AccountManager?
 
     private var pendingPhone: String?
 

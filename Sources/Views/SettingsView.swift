@@ -5,6 +5,8 @@ struct SettingsView: View {
     @EnvironmentObject var settings: SettingsStore
     @EnvironmentObject var manager: AccountManager
     @EnvironmentObject var logger: AppLogger
+    @EnvironmentObject var liveActivity: LiveActivityController
+    @EnvironmentObject var biometrics: BiometricService
 
     @State private var showLogoutConfirm = false
     @State private var shareLogURL: URL?
@@ -21,6 +23,10 @@ struct SettingsView: View {
                     section(l.t("settings.font")) { fontSection }
                     section(l.t("settings.delays")) { delaySection }
                     section("UX") { uxSection }
+                    section("Anti-flood") { antiFloodSection }
+                    section("Live Activity") { liveActivitySection }
+                    section("Безопасность") { securitySection }
+                    section("Уведомления") { notificationsSection }
                     section(l.t("settings.developer")) { developerSection }
                     section(l.t("settings.about")) { aboutSection }
                     section(l.t("settings.danger")) { dangerSection }
@@ -156,6 +162,82 @@ struct SettingsView: View {
                 .tint(settings.theme.accent)
             Divider().background(AppTheme.separator).padding(.vertical, 6)
             Toggle(l.t("settings.haptic"), isOn: $settings.haptic)
+                .tint(settings.theme.accent)
+        }
+    }
+
+    private var antiFloodSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Toggle("Smart retry on FloodWait", isOn: $settings.smartRetryOnFlood)
+                .tint(settings.theme.accent)
+            HStack {
+                Text("Макс. попыток").font(AppTheme.body(13))
+                    .foregroundStyle(AppTheme.textSecondary)
+                Spacer()
+                Stepper(value: $settings.maxFloodRetries, in: 0...5) {
+                    Text("\(settings.maxFloodRetries)").font(AppTheme.mono(12))
+                }.labelsHidden()
+            }
+            HStack {
+                Text("Fallback (с)").font(AppTheme.body(13))
+                    .foregroundStyle(AppTheme.textSecondary)
+                Spacer()
+                Stepper(value: $settings.floodFallbackSeconds, in: 5...300, step: 5) {
+                    Text("\(settings.floodFallbackSeconds)").font(AppTheme.mono(12))
+                }.labelsHidden()
+            }
+        }
+    }
+
+    private var liveActivitySection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Toggle("Включить Live Activity", isOn: $settings.liveActivityEnabled)
+                .tint(settings.theme.accent)
+                .onChange(of: settings.liveActivityEnabled) { newValue in
+                    Task {
+                        if newValue {
+                            await liveActivity.start(label: settings.liveActivityText)
+                        } else {
+                            await liveActivity.stop()
+                        }
+                    }
+                }
+            ThemedTextField(title: "Текст под чёлкой",
+                             text: $settings.liveActivityText,
+                             placeholder: "@MaksimXyila")
+                .onChange(of: settings.liveActivityText) { newValue in
+                    Task { await liveActivity.update(label: newValue) }
+                }
+            HStack {
+                Text("Статус")
+                    .font(AppTheme.body(13))
+                    .foregroundStyle(AppTheme.textSecondary)
+                Spacer()
+                Text(liveActivity.isRunning ? "running" : "stopped")
+                    .font(AppTheme.mono(12))
+                    .foregroundStyle(liveActivity.isRunning ? AppTheme.success : AppTheme.textTertiary)
+            }
+        }
+    }
+
+    private var securitySection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Toggle(isOn: $settings.biometricLock) {
+                Text("\(biometrics.biometryName) при запуске")
+            }
+            .tint(settings.theme.accent)
+            .disabled(!biometrics.isAvailable)
+            if !biometrics.isAvailable {
+                Text("Биометрия недоступна на этом устройстве")
+                    .font(AppTheme.body(11))
+                    .foregroundStyle(AppTheme.textTertiary)
+            }
+        }
+    }
+
+    private var notificationsSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Toggle("Уведомлять о завершении bulk", isOn: $settings.notifyOnBulkCompletion)
                 .tint(settings.theme.accent)
         }
     }

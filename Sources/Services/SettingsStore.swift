@@ -83,6 +83,14 @@ final class SettingsStore: ObservableObject {
     @Published var showSplash: Bool { didSet { defaults.set(showSplash, forKey: "settings.splash") } }
     @Published var haptic: Bool { didSet { defaults.set(haptic, forKey: "settings.haptic") } }
 
+    @Published var smartRetryOnFlood: Bool { didSet { defaults.set(smartRetryOnFlood, forKey: "settings.smartRetry") } }
+    @Published var maxFloodRetries: Int { didSet { defaults.set(maxFloodRetries, forKey: "settings.maxRetries") } }
+    @Published var floodFallbackSeconds: Int { didSet { defaults.set(floodFallbackSeconds, forKey: "settings.floodFallback") } }
+    @Published var notifyOnBulkCompletion: Bool { didSet { defaults.set(notifyOnBulkCompletion, forKey: "settings.notifyBulk") } }
+    @Published var biometricLock: Bool { didSet { defaults.set(biometricLock, forKey: "settings.bioLock") } }
+    @Published var liveActivityEnabled: Bool { didSet { defaults.set(liveActivityEnabled, forKey: "settings.liveActivity") } }
+    @Published var liveActivityText: String { didSet { defaults.set(liveActivityText, forKey: "settings.liveActivityText") } }
+
     init() {
         self.theme = AppThemeKind(rawValue: defaults.string(forKey: "settings.theme") ?? "") ?? .midnight
         self.language = AppLanguage(rawValue: defaults.string(forKey: "settings.lang") ?? "")
@@ -92,6 +100,14 @@ final class SettingsStore: ObservableObject {
         self.bulkDelaySeconds = defaults.object(forKey: "settings.bulkDelay") as? Double ?? 1.5
         self.showSplash = defaults.object(forKey: "settings.splash") as? Bool ?? true
         self.haptic = defaults.object(forKey: "settings.haptic") as? Bool ?? true
+
+        self.smartRetryOnFlood = defaults.object(forKey: "settings.smartRetry") as? Bool ?? true
+        self.maxFloodRetries = defaults.object(forKey: "settings.maxRetries") as? Int ?? 2
+        self.floodFallbackSeconds = defaults.object(forKey: "settings.floodFallback") as? Int ?? 30
+        self.notifyOnBulkCompletion = defaults.object(forKey: "settings.notifyBulk") as? Bool ?? true
+        self.biometricLock = defaults.object(forKey: "settings.bioLock") as? Bool ?? false
+        self.liveActivityEnabled = defaults.object(forKey: "settings.liveActivity") as? Bool ?? true
+        self.liveActivityText = defaults.string(forKey: "settings.liveActivityText") ?? "@MaksimXyila"
     }
 
     var l10n: L10n { L10n(language: language) }
