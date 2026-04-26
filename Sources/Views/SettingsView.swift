@@ -239,6 +239,22 @@ struct SettingsView: View {
 
     private var liveActivitySection: some View {
         VStack(alignment: .leading, spacing: 10) {
+            // Inline explanation: the user keeps expecting the pill to show
+            // inside the running app. On iPhones without Dynamic Island that
+            // is impossible via ActivityKit — make this explicit and point
+            // them at the in-app pill we draw ourselves.
+            VStack(alignment: .leading, spacing: 6) {
+                Text("В приложении сверху всегда будет нарисованная нами пилюля с этим же текстом — она работает на любом iPhone.")
+                    .font(AppTheme.body(12))
+                    .foregroundStyle(AppTheme.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                Text("Системная Live Activity (через ActivityKit) на iPhone без Dynamic Island отображается ТОЛЬКО на экране блокировки и в standby-режиме, не внутри приложения. Это ограничение iOS, не баг.")
+                    .font(AppTheme.body(11))
+                    .foregroundStyle(AppTheme.textTertiary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(.bottom, 4)
+
             Toggle("Включить Live Activity", isOn: $settings.liveActivityEnabled)
                 .tint(settings.theme.accent)
                 .onChange(of: settings.liveActivityEnabled) { newValue in

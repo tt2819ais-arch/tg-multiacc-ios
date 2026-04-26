@@ -36,6 +36,19 @@ struct RootView: View {
                     .transition(.opacity)
                     .zIndex(2)
             }
+
+            // In-app status pill drawn over everything except splash + lock.
+            // We use a custom overlay because real ActivityKit Live Activities
+            // do not render inside the running app on devices without Dynamic
+            // Island (iPhone 11/12/13).
+            if settings.liveActivityEnabled && splashDone
+                && !showingOnboarding
+                && !(needsLock && !biometrics.isUnlocked) {
+                StatusPillView()
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+                    .zIndex(5)
+                    .allowsHitTesting(true)
+            }
         }
         .animation(.easeInOut(duration: 0.4), value: biometrics.isUnlocked)
         .preferredColorScheme(settings.theme.isLight ? .light : .dark)

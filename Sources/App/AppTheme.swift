@@ -169,16 +169,40 @@ enum AppTheme {
 
 struct CardBackground: ViewModifier {
     var color: Color = AppTheme.surface
+    /// When true, layer a translucent material on top of the colour fill so
+    /// the card picks up colour from the content behind it. This is our
+    /// approximation of Apple's Liquid Glass material — `.ultraThinMaterial`
+    /// has shipped since iOS 15 and behaves identically on all our targets.
+    var glass: Bool = true
+
     func body(content: Content) -> some View {
         content
             .padding(16)
             .background(
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .fill(color)
+                ZStack {
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .fill(color)
+                    if glass {
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .fill(.ultraThinMaterial)
+                            .opacity(0.45)
+                    }
+                }
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .strokeBorder(AppTheme.separator, lineWidth: 1)
+                    .strokeBorder(
+                        LinearGradient(
+                            colors: [
+                                Color.white.opacity(0.10),
+                                AppTheme.separator,
+                                Color.black.opacity(0.06)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 0.6
+                    )
             )
     }
 }
@@ -186,6 +210,36 @@ struct CardBackground: ViewModifier {
 extension View {
     func card(_ color: Color = AppTheme.surface) -> some View {
         modifier(CardBackground(color: color))
+    }
+}
+
+/// Apply a translucent glass-style material to any container. Use this on
+/// custom panels / sheets where `.card` is too heavy.
+struct GlassPanelBackground: ViewModifier {
+    var cornerRadius: CGFloat = 18
+    var tint: Color = AppTheme.surfaceElevated
+    func body(content: Content) -> some View {
+        content
+            .background(
+                ZStack {
+                    RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                        .fill(tint.opacity(0.55))
+                    RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                        .fill(.ultraThinMaterial)
+                        .opacity(0.65)
+                }
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .strokeBorder(Color.white.opacity(0.08), lineWidth: 0.6)
+            )
+    }
+}
+
+extension View {
+    func glassPanel(cornerRadius: CGFloat = 18,
+                    tint: Color = AppTheme.surfaceElevated) -> some View {
+        modifier(GlassPanelBackground(cornerRadius: cornerRadius, tint: tint))
     }
 }
 
