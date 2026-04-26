@@ -1,6 +1,5 @@
 name: TGMultiAcc
 options:
-  bundleIdPrefix: com.devin.tgmultiacc
   deploymentTarget:
     iOS: "16.0"
   createIntermediateGroups: true
