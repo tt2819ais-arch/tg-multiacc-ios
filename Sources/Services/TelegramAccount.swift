@@ -348,7 +348,7 @@ final class TelegramAccount: ObservableObject, Identifiable {
 
     // MARK: - Helpers
 
-    private func humanReadable(_ error: Error) -> String {
+    private func humanReadable(_ error: Swift.Error) -> String {
         if let err = error as? TDLibKit.Error {
             return "TDLib error \(err.code): \(err.message)"
         }

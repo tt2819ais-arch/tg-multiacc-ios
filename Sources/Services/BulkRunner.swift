@@ -69,7 +69,7 @@ extension AccountManager {
         logger.info(category, "Bulk run finished (\(bulkState.results.filter(\.success).count)/\(bulkState.results.count) ok)")
     }
 
-    fileprivate func humanReadable(_ error: Error) -> String {
+    fileprivate func humanReadable(_ error: Swift.Error) -> String {
         if let tdErr = error as? TDLibKit.Error {
             return "TDLib \(tdErr.code): \(tdErr.message)"
         }

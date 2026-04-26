@@ -112,7 +112,7 @@ final class AppLogger: ObservableObject {
         log(.error, category: category, message, detail: detail)
     }
 
-    func error(_ category: String, _ message: String, error: Error) {
+    func error(_ category: String, _ message: String, error: Swift.Error) {
         let detail = "\(error)\n\(String(describing: type(of: error)))"
         log(.error, category: category, message, detail: detail)
     }
