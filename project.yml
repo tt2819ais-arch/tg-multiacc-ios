@@ -22,7 +22,7 @@ settings:
 packages:
   TDLibKit:
     url: https://github.com/Swiftgram/TDLibKit
-    from: "5.0.0"
+    exactVersion: "1.5.2-tdlib-1.8.63-a82128ab"
 
 targets:
   TGMultiAcc:
