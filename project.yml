@@ -5,6 +5,7 @@ options:
     iOS: "16.0"
   createIntermediateGroups: true
   generateEmptyDirectories: true
+  xcodeVersion: "15.0"
 
 settings:
   base:
