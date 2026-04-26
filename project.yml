@@ -40,8 +40,8 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.devin.tgmultiacc
-        MARKETING_VERSION: "1.1.0"
-        CURRENT_PROJECT_VERSION: "2"
+        MARKETING_VERSION: "1.2.0"
+        CURRENT_PROJECT_VERSION: "3"
         TARGETED_DEVICE_FAMILY: "1,2"
         GENERATE_INFOPLIST_FILE: "YES"
         INFOPLIST_KEY_UILaunchScreen_Generation: "YES"
@@ -50,7 +50,7 @@ targets:
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: "UIInterfaceOrientationPortrait"
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
         INFOPLIST_KEY_UIUserInterfaceStyle: "Dark"
-        INFOPLIST_KEY_CFBundleDisplayName: "TG MultiAcc"
+        INFOPLIST_KEY_CFBundleDisplayName: "Multi"
         INFOPLIST_KEY_LSApplicationCategoryType: "public.app-category.utilities"
         INFOPLIST_KEY_NSCameraUsageDescription: "Camera is not used."
         INFOPLIST_KEY_NSPhotoLibraryUsageDescription: "Photo library is not used."
@@ -70,9 +70,9 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.devin.tgmultiacc.widget
-        MARKETING_VERSION: "1.1.0"
-        CURRENT_PROJECT_VERSION: "2"
+        MARKETING_VERSION: "1.2.0"
+        CURRENT_PROJECT_VERSION: "3"
         INFOPLIST_FILE: WidgetExtension/Info.plist
-        INFOPLIST_KEY_CFBundleDisplayName: "TG MultiAcc"
+        INFOPLIST_KEY_CFBundleDisplayName: "Multi"
         INFOPLIST_KEY_NSExtensionPointIdentifier: "com.apple.widgetkit-extension"
         SKIP_INSTALL: "YES"

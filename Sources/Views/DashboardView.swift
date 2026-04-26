@@ -31,7 +31,7 @@ struct DashboardView: View {
     private var headerCard: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text("TG MULTIACC")
+                Text("Multi")
                     .font(AppTheme.mono(11))
                     .foregroundStyle(AppTheme.textTertiary)
                 Spacer()

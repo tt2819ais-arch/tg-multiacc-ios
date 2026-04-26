@@ -12,7 +12,7 @@ struct AboutView: View {
                 VStack(spacing: 16) {
                     header
                     section(title: "Что это", body:
-                        "TG MULTIACC — приложение для управления множеством " +
+                        "Multi — приложение для управления множеством " +
                         "Telegram-аккаунтов. Все сессии хранятся локально через " +
                         "официальную библиотеку TDLib. Один тап — действие " +
                         "выполняется со всех авторизованных аккаунтов сразу.")
@@ -89,7 +89,7 @@ struct AboutView: View {
             }
             .frame(width: 88, height: 88)
 
-            Text("TG MULTIACC").font(AppTheme.mono(13)).foregroundStyle(AppTheme.textTertiary)
+            Text("Multi").font(AppTheme.mono(13)).foregroundStyle(AppTheme.textTertiary)
             Text("Multi-account Telegram pilot")
                 .font(AppTheme.headline(18))
                 .foregroundStyle(AppTheme.textPrimary)

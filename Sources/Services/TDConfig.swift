@@ -7,7 +7,7 @@ enum TDConfig {
     static let apiId: Int = 22435995
     static let apiHash: String = "4c7b651950ed7f53520e66299453144d"
 
-    static let appName: String = "TG MultiAcc"
+    static let appName: String = "Multi"
     static let appVersion: String = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String) ?? "1.0"
 
     static var systemVersion: String {

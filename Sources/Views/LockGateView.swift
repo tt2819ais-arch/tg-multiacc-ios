@@ -26,7 +26,7 @@ struct LockGateView: View {
                     .foregroundStyle(AppTheme.accent)
                     .padding(.bottom, 4)
 
-                Text("TG MULTIACC")
+                Text("MULTI")
                     .font(AppTheme.title(26))
                     .foregroundStyle(AppTheme.textPrimary)
                 Text("Заблокировано")
@@ -98,7 +98,7 @@ struct LockGateView: View {
             if biometrics.canAttemptBiometrics && settings.lockMode.requiresBiometric {
                 Button {
                     Haptics.light()
-                    Task { await biometrics.authenticate(reason: "Разблокируй TG MULTIACC") }
+                    Task { await biometrics.authenticate(reason: "Разблокируй Multi") }
                 } label: {
                     Label("Войти через \(biometrics.biometryName)",
                           systemImage: biometrics.biometryType == .faceID ? "faceid" : "lock.shield")
@@ -141,7 +141,7 @@ struct LockGateView: View {
         guard !didAutoTry else { return }
         didAutoTry = true
         if settings.lockMode.requiresBiometric, biometrics.canAttemptBiometrics {
-            Task { await biometrics.authenticate(reason: "Разблокируй TG MULTIACC") }
+            Task { await biometrics.authenticate(reason: "Разблокируй Multi") }
         } else if settings.lockMode == .pin {
             showingPin = true
         }

@@ -203,8 +203,15 @@ struct PrimaryButtonStyle: ButtonStyle {
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
                     .fill(disabled ? fill.opacity(0.35) : fill)
             )
-            .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
-            .animation(.spring(response: 0.25, dampingFraction: 0.8), value: configuration.isPressed)
+            .overlay(
+                PressHaloOverlay(active: configuration.isPressed, cornerRadius: 14)
+                    .allowsHitTesting(false)
+            )
+            .scaleEffect(configuration.isPressed ? 0.965 : 1.0)
+            .animation(.spring(response: 0.32, dampingFraction: 0.72), value: configuration.isPressed)
+            .onChange(of: configuration.isPressed) { pressed in
+                if pressed { Haptics.light() }
+            }
     }
 }
 
@@ -223,8 +230,15 @@ struct SecondaryButtonStyle: ButtonStyle {
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
                     .strokeBorder(AppTheme.separator, lineWidth: 1)
             )
-            .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
-            .animation(.spring(response: 0.25, dampingFraction: 0.8), value: configuration.isPressed)
+            .overlay(
+                PressHaloOverlay(active: configuration.isPressed, cornerRadius: 14)
+                    .allowsHitTesting(false)
+            )
+            .scaleEffect(configuration.isPressed ? 0.965 : 1.0)
+            .animation(.spring(response: 0.32, dampingFraction: 0.72), value: configuration.isPressed)
+            .onChange(of: configuration.isPressed) { pressed in
+                if pressed { Haptics.selection() }
+            }
     }
 }
 
@@ -243,7 +257,14 @@ struct DangerButtonStyle: ButtonStyle {
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
                     .strokeBorder(AppTheme.danger.opacity(0.6), lineWidth: 1)
             )
-            .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
-            .animation(.spring(response: 0.25, dampingFraction: 0.8), value: configuration.isPressed)
+            .overlay(
+                PressHaloOverlay(active: configuration.isPressed, cornerRadius: 14)
+                    .allowsHitTesting(false)
+            )
+            .scaleEffect(configuration.isPressed ? 0.965 : 1.0)
+            .animation(.spring(response: 0.32, dampingFraction: 0.72), value: configuration.isPressed)
+            .onChange(of: configuration.isPressed) { pressed in
+                if pressed { Haptics.warning() }
+            }
     }
 }

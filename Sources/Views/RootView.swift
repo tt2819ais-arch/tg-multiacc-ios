@@ -5,8 +5,10 @@ struct RootView: View {
     @EnvironmentObject var logger: AppLogger
     @EnvironmentObject var manager: AccountManager
     @EnvironmentObject var biometrics: BiometricService
+    @Environment(\.scenePhase) private var scenePhase
     @State private var splashDone: Bool = false
     @State private var showingOnboarding: Bool = false
+    @State private var lastBackgroundedAt: Date? = nil
 
     var body: some View {
         ZStack {
@@ -14,15 +16,15 @@ struct RootView: View {
 
             if needsLock && !biometrics.isUnlocked {
                 LockGateView()
-                    .transition(.opacity)
+                    .transition(.opacity.combined(with: .scale(scale: 1.04)))
                     .zIndex(3)
             } else {
                 MainTabs()
                     .opacity(splashDone || !shouldShowSplash ? 1.0 : 0.0)
-                    .animation(.easeInOut(duration: 0.3), value: splashDone)
+                    .animation(.easeInOut(duration: 0.35), value: splashDone)
                     .overlay {
                         if showingOnboarding {
-                            OnboardingView { showingOnboarding = false; settings.onboardingCompleted = true }
+                            OnboardingView { finishOnboarding() }
                                 .transition(.opacity)
                                 .zIndex(4)
                         }
@@ -30,28 +32,78 @@ struct RootView: View {
             }
 
             if !splashDone && shouldShowSplash && !needsLock {
-                SplashView { splashDone = true }
+                SplashView { withAnimation(.easeOut(duration: 0.35)) { splashDone = true } }
                     .transition(.opacity)
                     .zIndex(2)
             }
         }
+        .animation(.easeInOut(duration: 0.4), value: biometrics.isUnlocked)
         .preferredColorScheme(settings.theme.isLight ? .light : .dark)
         .tint(settings.theme.accent)
         .onAppear {
-            if !shouldShowSplash { splashDone = true }
+            // Skip the splash entirely when the lock screen is going to take
+            // its place — otherwise the lock dismisses to a 0-opacity main
+            // view (because splashDone never flipped) and looks like a hang.
+            if !shouldShowSplash || needsLock { splashDone = true }
             if !settings.onboardingCompleted && !needsLock {
-                // Defer the first-launch tutorial until after the splash so it
-                // fades in over the actual UI rather than over a black screen.
                 Task {
                     try? await Task.sleep(nanoseconds: 1_900_000_000)
-                    showingOnboarding = true
+                    await MainActor.run {
+                        withAnimation(.easeInOut(duration: 0.35)) { showingOnboarding = true }
+                    }
                 }
             }
         }
+        .onChange(of: biometrics.isUnlocked) { unlocked in
+            if unlocked && !settings.onboardingCompleted {
+                Task {
+                    try? await Task.sleep(nanoseconds: 600_000_000)
+                    await MainActor.run {
+                        withAnimation(.easeInOut(duration: 0.35)) { showingOnboarding = true }
+                    }
+                }
+            }
+        }
+        .onChange(of: scenePhase) { phase in
+            handleScenePhase(phase)
+        }
+    }
+
+    /// Re-lock the app when it has been in the background for more than a few
+    /// seconds. This mirrors how banking / messenger apps behave: a quick
+    /// notification check doesn't force re-auth, but actually leaving the app
+    /// does.
+    private func handleScenePhase(_ phase: ScenePhase) {
+        switch phase {
+        case .background, .inactive:
+            if biometrics.isUnlocked {
+                lastBackgroundedAt = Date()
+            }
+        case .active:
+            if let last = lastBackgroundedAt,
+               Date().timeIntervalSince(last) > 15,
+               settings.lockMode.requiresLock {
+                biometrics.lock()
+            }
+            lastBackgroundedAt = nil
+        @unknown default:
+            break
+        }
+    }
+
+    private func finishOnboarding() {
+        withAnimation(.easeInOut(duration: 0.3)) {
+            showingOnboarding = false
+        }
+        settings.onboardingCompleted = true
+        Haptics.success()
     }
 
     private var needsLock: Bool {
-        settings.lockMode.requiresLock && (settings.lockMode == .pin || biometrics.systemBiometricsAvailable || biometrics.hasPin)
+        settings.lockMode.requiresLock
+            && (settings.lockMode == .pin
+                || biometrics.systemBiometricsAvailable
+                || biometrics.hasPin)
     }
 
     private var shouldShowSplash: Bool {

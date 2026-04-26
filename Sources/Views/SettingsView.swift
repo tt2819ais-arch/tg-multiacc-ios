@@ -283,7 +283,7 @@ struct SettingsView: View {
                     .foregroundStyle(AppTheme.danger)
             }
             if !liveActivity.systemAllowsActivities {
-                Text("Включи Live Activity в Настройки → Уведомления → TG MULTIACC, или в самих настройках iOS («Live Activities»).")
+                Text("Включи Live Activity в Настройки → Уведомления → Multi, или в самих настройках iOS («Live Activities»).")
                     .font(AppTheme.body(11))
                     .foregroundStyle(AppTheme.textTertiary)
             }
