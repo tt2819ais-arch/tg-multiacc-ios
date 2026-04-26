@@ -50,7 +50,12 @@ final class LiveActivityController: ObservableObject {
         #if canImport(ActivityKit)
         guard #available(iOS 16.1, *) else { return }
         for activity in Activity<TGActivityAttributes>.activities {
-            let prev = activity.content.state
+            let prev: TGActivityAttributes.ContentState
+            if #available(iOS 16.2, *) {
+                prev = activity.content.state
+            } else {
+                prev = activity.contentState
+            }
             let state = TGActivityAttributes.ContentState(
                 label: label,
                 totalAccounts: prev.totalAccounts,
