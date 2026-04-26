@@ -86,7 +86,7 @@ jobs:
             DEVELOPMENT_TEAM="" \
             ONLY_ACTIVE_ARCH=NO \
             ENABLE_BITCODE=NO \
-            build | xcbeautify || (echo "::error::xcodebuild failed"; exit 1)
+            build 2>&1 | tee xcodebuild.log | xcbeautify || (echo "::error::xcodebuild failed"; echo "----- raw xcodebuild errors -----"; grep -E " error:|fatal error|Undefined symbol|cannot find|reference to|expected|use of unresolved|SwiftCompile" xcodebuild.log | head -200; exit 1)
 
       - name: Locate .app bundle
         id: locate
