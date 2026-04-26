@@ -6,20 +6,40 @@ import ActivityKit
 /// Drives the lifecycle of the Live Activity that displays the developer
 /// handle ("@MaksimXyila") near the iPhone status bar / Dynamic Island.
 ///
-/// Live Activities require iOS 16.1+. On older systems and on simulator
-/// without a real device, all calls are no-ops.
+/// Live Activities require iOS 16.1+. On older systems all calls are
+/// no-ops. Errors are surfaced through `lastError` so the Settings screen
+/// can explain why nothing appears under the notch (most commonly the
+/// system-wide "Live Activities" toggle is OFF).
 @MainActor
 final class LiveActivityController: ObservableObject {
     static let shared = LiveActivityController()
-    private init() {}
+    private init() {
+        refreshAuthorizationStatus()
+    }
 
     @Published var isRunning: Bool = false
+    @Published var systemAllowsActivities: Bool = false
+    @Published var lastError: String?
+
+    func refreshAuthorizationStatus() {
+        #if canImport(ActivityKit)
+        if #available(iOS 16.1, *) {
+            systemAllowsActivities = ActivityAuthorizationInfo().areActivitiesEnabled
+        }
+        #endif
+    }
 
     func start(label: String) async {
         #if canImport(ActivityKit)
-        guard #available(iOS 16.1, *) else { return }
-        guard ActivityAuthorizationInfo().areActivitiesEnabled else { return }
-        // Stop any previous running activity to avoid duplicates.
+        guard #available(iOS 16.1, *) else {
+            lastError = "Live Activities требуют iOS 16.1+"
+            return
+        }
+        refreshAuthorizationStatus()
+        guard ActivityAuthorizationInfo().areActivitiesEnabled else {
+            lastError = "Live Activity отключена в системных настройках iOS"
+            return
+        }
         await stop()
         let attributes = TGActivityAttributes(name: "TGMultiAcc")
         let initial = TGActivityAttributes.ContentState(label: label)
@@ -38,14 +58,14 @@ final class LiveActivityController: ObservableObject {
                 )
             }
             isRunning = true
+            lastError = nil
         } catch {
-            // Activity could not be started (rate-limited, disabled, etc.).
             isRunning = false
+            lastError = "Не удалось запустить: \(error.localizedDescription)"
         }
         #endif
     }
 
-    /// Convenience overload for views that only know the label text.
     func update(label: String) async {
         #if canImport(ActivityKit)
         guard #available(iOS 16.1, *) else { return }

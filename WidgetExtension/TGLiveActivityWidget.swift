@@ -3,16 +3,17 @@ import SwiftUI
 import ActivityKit
 
 /// Live Activity surface visible on:
-/// • Lock screen (full island) — wide pill with developer handle + counters.
+/// • Lock screen / banner under the notch on notched iPhones — wide
+///   monochrome pill with the developer handle.
 /// • Dynamic Island (compact / minimal / expanded) — accent badge.
-/// • Notched iPhones (e.g. iPhone 11) — TDLib-style pill near the status bar.
+///
+/// Colors stay close to system grays per the user's "no neon" guidance.
 @available(iOS 16.1, *)
 struct TGLiveActivityWidget: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: TGActivityAttributes.self) { context in
-            // Lock-screen + iPhone-without-island banner.
             TGLockScreenLiveActivityView(state: context.state)
-                .activityBackgroundTint(Color.black)
+                .activityBackgroundTint(Color.black.opacity(0.8))
                 .activitySystemActionForegroundColor(Color.white)
         } dynamicIsland: { context in
             DynamicIsland {
@@ -23,13 +24,13 @@ struct TGLiveActivityWidget: Widget {
                             .foregroundColor(.white)
                     } icon: {
                         Image(systemName: "paperplane.fill")
-                            .foregroundColor(.cyan)
+                            .foregroundColor(Color.white.opacity(0.9))
                     }
                 }
                 DynamicIslandExpandedRegion(.trailing) {
                     HStack(spacing: 6) {
                         Image(systemName: "person.2.fill")
-                            .foregroundColor(.cyan)
+                            .foregroundColor(Color.white.opacity(0.7))
                         Text("\(context.state.ready)/\(context.state.totalAccounts)")
                             .font(.system(size: 13, weight: .bold, design: .monospaced))
                             .foregroundColor(.white)
@@ -48,16 +49,18 @@ struct TGLiveActivityWidget: Widget {
                     }
                 }
             } compactLeading: {
-                Image(systemName: "paperplane.fill").foregroundColor(.cyan)
+                Image(systemName: "paperplane.fill")
+                    .foregroundColor(Color.white.opacity(0.9))
             } compactTrailing: {
                 Text(context.state.label)
                     .font(.system(size: 12, weight: .heavy, design: .rounded))
                     .foregroundColor(.white)
                     .lineLimit(1)
             } minimal: {
-                Image(systemName: "paperplane.fill").foregroundColor(.cyan)
+                Image(systemName: "paperplane.fill")
+                    .foregroundColor(Color.white.opacity(0.9))
             }
-            .keylineTint(.cyan)
+            .keylineTint(Color.white.opacity(0.55))
         }
     }
 }
@@ -70,21 +73,23 @@ struct TGLockScreenLiveActivityView: View {
         HStack(spacing: 14) {
             ZStack {
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .fill(LinearGradient(colors: [Color.cyan, Color.blue],
-                                          startPoint: .topLeading,
-                                          endPoint: .bottomTrailing))
+                    .fill(Color.white.opacity(0.10))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .strokeBorder(Color.white.opacity(0.18), lineWidth: 1)
+                    )
                 Image(systemName: "paperplane.fill")
                     .foregroundColor(.white)
-                    .font(.system(size: 22, weight: .black))
+                    .font(.system(size: 22, weight: .bold))
             }
             .frame(width: 46, height: 46)
 
             VStack(alignment: .leading, spacing: 3) {
                 Text("TG MULTIACC")
                     .font(.system(size: 11, weight: .heavy, design: .monospaced))
-                    .foregroundColor(.white.opacity(0.6))
+                    .foregroundColor(.white.opacity(0.55))
                 Text(state.label)
-                    .font(.system(size: 18, weight: .black, design: .rounded))
+                    .font(.system(size: 18, weight: .bold, design: .rounded))
                     .foregroundColor(.white)
                     .lineLimit(1)
             }
@@ -92,11 +97,13 @@ struct TGLockScreenLiveActivityView: View {
             Spacer()
 
             VStack(alignment: .trailing, spacing: 3) {
-                HStack(spacing: 6) {
-                    Image(systemName: "person.2.fill").foregroundColor(.cyan)
-                    Text("\(state.ready)/\(state.totalAccounts)")
-                        .font(.system(size: 14, weight: .bold, design: .monospaced))
-                        .foregroundColor(.white)
+                if state.totalAccounts > 0 {
+                    HStack(spacing: 6) {
+                        Image(systemName: "person.2.fill").foregroundColor(.white.opacity(0.7))
+                        Text("\(state.ready)/\(state.totalAccounts)")
+                            .font(.system(size: 14, weight: .bold, design: .monospaced))
+                            .foregroundColor(.white)
+                    }
                 }
                 if !state.lastAction.isEmpty {
                     Text(state.lastAction)

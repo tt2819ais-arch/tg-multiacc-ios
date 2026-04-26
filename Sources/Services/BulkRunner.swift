@@ -93,6 +93,17 @@ extension AccountManager {
         let ok = bulkState.results.filter(\.success).count
         let total = bulkState.results.count
         logger.info(category, "Bulk run finished (\(ok)/\(total) ok)")
+        // Distinct haptic pattern based on outcome so the user doesn't have
+        // to look at the screen to know how the run ended.
+        if total > 0 {
+            if ok == total {
+                Haptics.success()
+            } else if ok == 0 {
+                Haptics.error()
+            } else {
+                Haptics.warning()
+            }
+        }
         if settings.notifyOnBulkCompletion {
             NotificationService.shared.notifyNow(
                 title: "Bulk \"\(category)\" finished",

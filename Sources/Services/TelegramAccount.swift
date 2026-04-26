@@ -17,10 +17,41 @@ final class TelegramAccount: ObservableObject, Identifiable {
     private var pendingPhone: String?
 
     var displayLabel: String {
-        if !meta.displayName.isEmpty { return meta.displayName }
+        // Prefer the public @username — Telegram lets users set first/last to
+        // invisible filler characters (Hangul fillers, ZWSP, lone punctuation),
+        // which renders as gibberish in our logs and lists.
         if let u = meta.username, !u.isEmpty { return "@\(u)" }
+        let cleaned = Self.sanitizeName(meta.displayName)
+        if !cleaned.isEmpty { return cleaned }
         if !meta.phoneNumber.isEmpty { return meta.phoneNumber }
         return "Account #\(id.prefix(6))"
+    }
+
+    /// Strip Unicode invisible/whitespace characters that some Telegram
+    /// users put in their first / last name fields. Returns an empty string
+    /// if the name turns out to be only punctuation/whitespace after the
+    /// cleanup, so callers can fall back to @username or phone.
+    static func sanitizeName(_ raw: String) -> String {
+        let invisibleScalars: Set<Unicode.Scalar> = [
+            "\u{200B}", "\u{200C}", "\u{200D}",   // zero-width space / non-joiner / joiner
+            "\u{2060}", "\u{FEFF}",                // word joiner / BOM
+            "\u{3164}",                            // Hangul filler
+            "\u{115F}", "\u{1160}",                // Hangul choseong / jungseong filler
+            "\u{17B4}", "\u{17B5}",                // Khmer invisible
+            "\u{180E}",                            // Mongolian vowel separator
+            "\u{2800}"                             // Braille blank
+        ]
+        var scalars = String.UnicodeScalarView()
+        for scalar in raw.unicodeScalars where !invisibleScalars.contains(scalar) {
+            scalars.append(scalar)
+        }
+        let stripped = String(scalars)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        // If only punctuation is left it's not a meaningful name.
+        let meaningful = stripped.unicodeScalars.contains { scalar in
+            CharacterSet.letters.contains(scalar) || CharacterSet.decimalDigits.contains(scalar)
+        }
+        return meaningful ? stripped : ""
     }
 
     init(meta: AccountMeta, manager: AccountManager, clientManager: TDLibClientManager, logger: AppLogger) {
@@ -44,7 +75,12 @@ final class TelegramAccount: ObservableObject, Identifiable {
                     weakSelfBox.value?.handle(update: update)
                 }
             } catch {
-                loggerRef?.error("tdlib", "Failed to decode update for \(accountId)", error: error)
+                // Library version mismatch: TDLib server occasionally adds
+                // new fields (`media`, `gift`, etc.) that older Swift
+                // bindings don't know about. These misses don't break the
+                // app, so we log them at debug level instead of polluting
+                // the user-facing error feed.
+                loggerRef?.debug("tdlib", "skipped unknown update for \(accountId): \(error.localizedDescription)")
             }
         }
 
